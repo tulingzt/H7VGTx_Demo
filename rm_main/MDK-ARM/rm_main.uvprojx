@@ -996,14 +996,14 @@
               <FilePath>..\User\Protocol\prot_judge.c</FilePath>
             </File>
             <File>
-              <FileName>prot_vision.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Protocol\prot_vision.c</FilePath>
-            </File>
-            <File>
               <FileName>prot_power.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Protocol\prot_power.c</FilePath>
+            </File>
+            <File>
+              <FileName>prot_vision.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Protocol\prot_vision.c</FilePath>
             </File>
           </Files>
         </Group>

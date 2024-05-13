@@ -355,6 +355,7 @@ static void chassis_data_input(void)
     //陀螺仪数据输入
     wlr.roll_fdb    =  chassis_imu.rol;
     wlr.pit_fdb     = -chassis_imu.pit;
+    wlr.wx_fdb      =  chassis_imu.wx * 0.2f + wlr.wx_fdb * 0.8f;
     wlr.wy_fdb      = -chassis_imu.wy;
     wlr.wz_fdb      =  chassis_imu.wz;
     wlr.az_fdb      =  chassis_imu.az;

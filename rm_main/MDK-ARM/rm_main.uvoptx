@@ -253,37 +253,27 @@
         <Ww>
           <count>20</count>
           <WinNumber>1</WinNumber>
-          <ItemText>lqr</ItemText>
+          <ItemText>supercap,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>21</count>
           <WinNumber>1</WinNumber>
-          <ItemText>supercap</ItemText>
+          <ItemText>power_control</ItemText>
         </Ww>
         <Ww>
           <count>22</count>
           <WinNumber>1</WinNumber>
-          <ItemText>yaw_err</ItemText>
+          <ItemText>power_heat_data,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>23</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_pit</ItemText>
+          <ItemText>K_Array_Prone</ItemText>
         </Ww>
         <Ww>
           <count>24</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_max</ItemText>
-        </Ww>
-        <Ww>
-          <count>25</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>chassis_min</ItemText>
-        </Ww>
-        <Ww>
-          <count>26</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>kal_v</ItemText>
+          <ItemText>buf</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -321,21 +311,6 @@
           <count>6</count>
           <WinNumber>2</WinNumber>
           <ItemText>pid_roll</ItemText>
-        </Ww>
-        <Ww>
-          <count>7</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>pid_q0</ItemText>
-        </Ww>
-        <Ww>
-          <count>8</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>x0_clear</ItemText>
-        </Ww>
-        <Ww>
-          <count>9</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>K_Array_Prone</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>
@@ -907,8 +882,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Protocol\prot_vision.c</PathWithFileName>
-      <FilenameWithoutPath>prot_vision.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Protocol\prot_power.c</PathWithFileName>
+      <FilenameWithoutPath>prot_power.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -919,8 +894,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Protocol\prot_power.c</PathWithFileName>
-      <FilenameWithoutPath>prot_power.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Protocol\prot_vision.c</PathWithFileName>
+      <FilenameWithoutPath>prot_vision.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -928,7 +903,7 @@
 
   <Group>
     <GroupName>User/Math</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

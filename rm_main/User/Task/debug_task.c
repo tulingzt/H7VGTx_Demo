@@ -20,7 +20,7 @@
 
 us_time_t test_time;
 kalman_filter_t test;
-uint8_t debug_wave = 10;
+uint8_t debug_wave = 11;
 
 void log_scope_data_pkg(void)
 {
@@ -96,7 +96,7 @@ void log_scope_data_pkg(void)
             log_scope_get_data(vmc[1].L_fdb);
             log_scope_get_data(wlr.high_set);
             break;
-        } case 8: {
+        } case 8: {//腿部力
             log_scope_get_data(wlr.side[0].Fy);
             log_scope_get_data(wlr.side[0].T0);
             log_scope_get_data(wlr.side[1].Fy);
@@ -107,7 +107,7 @@ void log_scope_data_pkg(void)
             log_scope_get_data(wlr.side[1].Fy);
             log_scope_get_data(wlr.side[1].T0);
             break;
-        } case 9: {
+        } case 9: {//速度融合
             log_scope_get_data(wlr.side[0].v_fdb);
             log_scope_get_data(wlr.side[0].v_kal);
             log_scope_get_data(wlr.side[1].v_fdb);
@@ -117,12 +117,17 @@ void log_scope_data_pkg(void)
 //            log_scope_get_data(wlr.side[1].a_fdb);
 //            log_scope_get_data(wlr.side[1].a_kal);
             break;
-        } case 10: {
+        } case 10: {//定点控制
             log_scope_get_data(lqr[0].X_fdb[0]);
             log_scope_get_data(lqr[0].X_fdb[1]);
             log_scope_get_data(lqr[1].X_fdb[0]);
             log_scope_get_data(lqr[1].X_fdb[1]);
             break;
+        } case 11: {
+            log_scope_get_data(wlr.roll_set);
+            log_scope_get_data(wlr.roll_fdb);
+            log_scope_get_data(wlr.wx_set);
+            log_scope_get_data(wlr.wx_fdb);
         }default:break;
     }
 }

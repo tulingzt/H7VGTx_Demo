@@ -17,19 +17,19 @@ const float LegLengthParam[5] = {0.150f, 0.270f, 0.270f, 0.150f, 0.150f};
 float mb = 4.4f, ml = 2.09f, mw = 0.715f;//机体质量 腿部质量 轮子质量 14.5
 const float BodyWidth = 0.42f;//两轮间距
 const float WheelRadius = 0.06f;//轮子半径
-const float LegLengthMax = 0.25f, LegLengthMin = 0.10f;
+const float LegLengthMax = 0.30f, LegLengthMin = 0.10f;
 
 const float LegLengthJump1 = 0.15f;//压腿
 const float LegLengthJump2 = 0.35f;//蹬腿
 const float LegLengthJump3 = 0.24f;//收腿
 const float LegLengthJump4 = 0.22f;//落地
 
-const float LegLengthHightFly = 0.30f;//长腿腿长腾空
-const float LegLengthFly = 0.25f;//正常腿长腾空
-const float LegLengthHigh = 0.25f;//长腿
-const float LegLengthNormal = 0.20f;//正常
+const float LegLengthHightFly = 0.28f;//长腿腿长腾空 0.28
+const float LegLengthFly = 0.23f;//正常腿长腾空
+const float LegLengthHigh = 0.23f;//长腿 0.23
+const float LegLengthNormal = 0.18f;//正常
 
-float x3_balance_zero = 0.08f, x5_balance_zero = -0.02f;//腿摆角角度偏置 机体俯仰角度偏置
+float x3_balance_zero = 0.08f, x5_balance_zero = 0.02f;//腿摆角角度偏置 机体俯仰角度偏置
 float x3_fight_zero = 0.06f;
 //								位移  速度	角度	角速度  角度	角速度
 float K_Array_Wheel[2][6] =		{{60, 30, 80, 8, 300, 10}, 
@@ -65,7 +65,7 @@ kalman_filter_t kal_fn[2], kal_v[2];
 
 pid_t pid_leg_length[2];
 pid_t pid_leg_length_fast[2];
-pid_t pid_q0, pid_roll, pid_yaw, pid_wz;
+pid_t pid_q0, pid_roll, pid_wx, pid_yaw, pid_wz;
 
 static float wlr_fn_calc(float az, float Fy_fdb, float T0_fdb, float L0[3], float theta[3])
 {
@@ -137,10 +137,10 @@ void wlr_init(void)
 	//PID参数初始化
     pid_init(&pid_yaw, NONE, -7, 0, 0, 0, 10);
 	pid_init(&pid_wz, NONE, 2.0f, 0, 7.0f, 0, 2.5f);
-//    pid_init(&pid_yaw, -5, 0, 0, 0, 7);
-//	pid_init(&pid_wz, 2.0f, 0, 7.0f, 0, 2.5f);//与LQR的速度控制协同
 	pid_init(&pid_q0, NONE, 60, 0, 100, 0, 10);//与LQR的虚拟腿摆角控制拮抗 60 0 120
 	pid_init(&pid_roll, NONE, 500, 0, 3000, 0, 30);//与VMC的腿长控制协同  1000 0 3500
+//    pid_init(&pid_roll, NONE, 0, 0, 0, 0, 0);
+//    pid_init(&pid_wx, NONE, 13, 0, 0, 0, 10);
 }
 
 void wlr_protest(void)
@@ -153,13 +153,20 @@ void wlr_protest(void)
 void wlr_control(void)
 {
 	//------------------------反馈数据更新------------------------//
-	wlr.wz_set = pid_calc(&pid_yaw, wlr.yaw_fdb + wlr.yaw_err, wlr.yaw_fdb);
     //限制
     float v_fdb = (kal_v[0].filter_vector[0]+kal_v[1].filter_vector[0])/2.0f;
     if (fabs(v_fdb) > fabs(wlr.v_set))//加强超速控制
         wlr.v_set = data_fusion(wlr.v_set, 0, fabs(v_fdb - wlr.v_set));
-    wlr.wz_set = data_fusion(wlr.wz_set, 0, fabs(v_fdb/3.0f));//限制旋转速度 
-    wlr.v_set = data_fusion(wlr.v_set, 0, fabs(wlr.wz_fdb)/6.0f);//限制前进速度
+    if (chassis.mode == CHASSIS_MODE_REMOTER_ROTATE ||
+        chassis.mode == CHASSIS_MODE_KEYBOARD_ROTATE) {
+        wlr.wz_set = 9;                                                 //小陀螺时固定转速 减小前进
+        wlr.v_set = -0.5f * wlr.v_set;
+    } else {
+        wlr.wz_set = pid_calc(&pid_yaw, wlr.yaw_fdb + wlr.yaw_err, wlr.yaw_fdb);
+        wlr.v_set = data_fusion(wlr.v_set, 0, fabs(wlr.wz_fdb)/6.0f);   //限制前进速度 旋转过快
+    }
+    wlr.wz_set = data_fusion(wlr.wz_set, 0, fabs(v_fdb/3.0f));          //限制旋转速度 前进过快
+    wlr.wz_set = data_fusion(wlr.wz_set, 0, fabs(wlr.roll_fdb/0.2f));   //限制旋转速度 roll太偏
 	//更新两轮模型
 	twm_feedback_calc(&twm, wlr.side[0].wy, wlr.side[1].wy, wlr.wz_fdb);//输入左右轮子转速
 	twm_reference_calc(&twm, wlr.v_set, wlr.wz_set);//计算两侧轮腿模型的设定速度
@@ -184,7 +191,7 @@ void wlr_control(void)
         //定点控制第一方案
 //        lqr[i].X_fdb[0] += (lqr[i].X_fdb[1] + lqr[i].last_x2) / 2 * CHASSIS_PERIOD_DU * 0.04f;//使用梯形积分速度求位移
         //定点控制第二方案
-        lqr[i].X_fdb[0] = - WLR_SIGN(i) * driver_motor[i].position * WheelRadius;
+        lqr[i].X_fdb[0] = -2 * WLR_SIGN(i) * driver_motor[i].position * WheelRadius;
 		lqr[i].X_fdb[4] = x5_balance_zero + wlr.pit_fdb;
 		lqr[i].X_fdb[5] = wlr.wy_fdb;
         if (chassis.mode == CHASSIS_MODE_KEYBOARD_FIGHT)
@@ -194,8 +201,7 @@ void wlr_control(void)
 		lqr[i].X_fdb[3] = lqr[i].X_fdb[5] - vmc[i].V_fdb.e.w0_fdb;
 		lqr[i].dot_x4 = (lqr[i].X_fdb[3] - lqr[i].last_x4) / (CHASSIS_PERIOD_DU * 0.001f); //腿倾角加速度(状态变量x4的dot)计算
 		lqr[i].last_x4 = lqr[i].X_fdb[3];
-//		data_limit(&lqr[i].X_fdb[0], -1.0f, 1.0f);//位移限幅  位移系数主要起到一个适应重心的作用 不用太大
-        if(ABS(wlr.v_set) > 1e-3f || ABS(wlr.wz_set) > 0.1f || ABS(vmc[0].q_fdb[0] - vmc[1].q_fdb[0]) > 0.02f) {//有输入速度 或 两腿有差角时 将位移反馈置0  不发挥作用
+        if(ABS(wlr.v_set) > 1e-3f || ABS(wlr.wz_set) > 0.1f || ABS(vmc[0].q_fdb[0] - vmc[1].q_fdb[0]) > 0.05f) {//有输入速度 或 两腿有差角时 将位移反馈置0  不发挥作用
             //定点控制第一方案	
 //            lqr[i].X_fdb[0] = 0;
             //定点控制第二方案
@@ -213,8 +219,8 @@ void wlr_control(void)
             wlr.side[i].fly_cnt++;
         else if(wlr.side[i].fly_cnt != 0)
             wlr.side[i].fly_cnt--;
-        if(wlr.side[i].fly_cnt > 20) {
-            wlr.side[i].fly_cnt = 20;
+        if(wlr.side[i].fly_cnt > 30) {
+            wlr.side[i].fly_cnt = 30;
             wlr.side[i].fly_flag = 1;
         } else if(wlr.side[i].fly_cnt == 0)
         wlr.side[i].fly_flag = 0;
@@ -252,7 +258,7 @@ void wlr_control(void)
     if (wlr.high_flag) {
         wlr.high_set = data_fusion(wlr.high_set, 0.90f * wlr.high_set, fabs(wlr.wz_set/6.0f));
     }
-    wlr.high_set = data_fusion(wlr.high_set, LegLengthMin, (fabs(lqr[0].X_fdb[2])+fabs(lqr[1].X_fdb[2]))/2.0f/1.57f);
+    wlr.high_set = data_fusion(wlr.high_set, LegLengthMin, (fabs(lqr[0].X_fdb[2])+fabs(lqr[1].X_fdb[2]))/2.0f/2.0f);
 	//更新两腿模型
 	tlm_gnd_roll_calc(&tlm, -wlr.roll_fdb, vmc[0].L_fdb, vmc[1].L_fdb);//计算地形倾角
 	if (wlr.jump_flag != 0 || (wlr.side[0].fly_flag && wlr.side[1].fly_flag))
@@ -289,9 +295,19 @@ void wlr_control(void)
     }
 	//------------------------控制数据更新------------------------//
 	//全身运动控制
-	wlr.q0_offs   = pid_calc(&pid_q0, vmc[0].q_fdb[0], vmc[1].q_fdb[0]);//双腿摆角同步控制
+    if (fabs(wlr.wz_set) > 1) {
+        wlr.q0_offs   = 0;                                                  //小陀螺时不用同步
+    } else {
+        wlr.q0_offs   = pid_calc(&pid_q0, vmc[0].q_fdb[0], vmc[1].q_fdb[0]);//双腿摆角同步控制
+    }
 	wlr.roll_offs = pid_calc(&pid_roll, wlr.roll_set, wlr.roll_fdb);
-	wlr.wz_offs   = pid_calc(&pid_wz, wlr.wz_fdb, wlr.wz_set);//Yaw控制
+//    wlr.wx_set = pid_calc(&pid_roll, wlr.roll_set, wlr.roll_fdb);
+//    wlr.roll_offs = pid_calc(&pid_wx, wlr.wx_set, wlr.wx_fdb);
+    if (wlr.side[0].fly_flag && wlr.side[1].fly_flag) {//腾空
+        wlr.wz_offs   = 0;
+    } else {
+        wlr.wz_offs   = pid_calc(&pid_wz, wlr.wz_fdb, wlr.wz_set);//Yaw控制
+    }
 	//两侧轮腿分别独立控制
 	for (int i = 0; i < 2; i++) {
 		//LQR输入控制值 计算得出轮子与腿的力矩
@@ -317,10 +333,6 @@ void wlr_control(void)
 			wlr.side[i].Fy = pid_calc(&pid_leg_length[i], tlm.l_ref[i], vmc[i].L_fdb)\
                                  + 27 + WLR_SIGN(i) * wlr.roll_offs;
 		wlr.side[i].T0 = -lqr[i].U_ref[0] / 2 + WLR_SIGN(i) * wlr.q0_offs;	//两条腿时，LQR输出力矩需要除以2
-//        if (wlr.prone_flag) {
-//            wlr.side[i].Fy = 0;
-//            wlr.side[i].T0 = 0;
-//        }
 		vmc_inverse_solution(&vmc[i], wlr.high_set, wlr.q0_set, wlr.side[i].T0, wlr.side[i].Fy);
 	}
 	//------------------------控制数据输出------------------------//

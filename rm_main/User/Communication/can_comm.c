@@ -34,7 +34,7 @@ void can_comm_init(void)
     can_filter.FilterIndex = 1;
     can_filter.FilterType = FDCAN_FILTER_DUAL;//等于过滤
     can_filter.FilterID1 = 0x000;
-    can_filter.FilterID2 = 0x000;
+    can_filter.FilterID2 = 0x005;
     can_filter.FilterConfig = FDCAN_FILTER_TO_RXFIFO1;//通过过滤后给邮箱1
     HAL_FDCAN_ConfigFilter(&hfdcan1, &can_filter);
     HAL_FDCAN_ConfigGlobalFilter(&hfdcan1, FDCAN_REJECT, FDCAN_REJECT, FDCAN_REJECT_REMOTE, FDCAN_REJECT_REMOTE);

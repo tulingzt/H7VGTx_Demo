@@ -23,9 +23,9 @@ typedef struct
     float yaw_err;
     //目标数据
     float v_set, yaw_set, high_set, roll_set, q0_set;
-    float wz_set;
+    float wz_set, wx_set;
     //反馈数据
-    float yaw_fdb, roll_fdb, pit_fdb, wy_fdb, wz_fdb, az_fdb;
+    float yaw_fdb, roll_fdb, pit_fdb, wz_fdb, wx_fdb, wy_fdb, az_fdb;
     //补偿
     float q0_offs, roll_offs, wz_offs;
     //控制标志

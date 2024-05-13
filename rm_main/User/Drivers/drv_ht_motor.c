@@ -22,7 +22,7 @@ static float uint_to_float(int x_int, float x_min, float x_max, int bits)
     return ((float)x_int)*span/((float)((1<<bits)-1)) + offset;
 }
 
-static void ht_motor_output_single_data(ht_motor_t *motor);
+//static void ht_motor_output_single_data(ht_motor_t *motor);
 
 /*
  * @brief     海泰电机初始化设置
@@ -116,6 +116,12 @@ void ht_motor_output_single_data(ht_motor_t *motor)
 {
     static uint8_t buf[8];
     uint16_t p, v ,kp, kd, t;
+//    //限制输入的参数在定义的范围内
+//    LIMIT_MIN_MAX(motor->p, P_MIN, P_MAX);
+//    LIMIT_MIN_MAX(motor->v, V_MIN, V_MAX);
+//    LIMIT_MIN_MAX(motor->kp, KP_MIN, KP_MAX);
+//    LIMIT_MIN_MAX(motor->kd, KD_MIN, KD_MAX);
+//    LIMIT_MIN_MAX(motor->t, T_MIN+1, T_MAX-1);
     //根据协议，对float参数进行转换
     p = float_to_uint(motor->p, P_MIN, P_MAX, 16);
     v = float_to_uint(motor->v, V_MIN, V_MAX, 12);

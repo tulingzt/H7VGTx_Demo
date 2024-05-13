@@ -45,6 +45,6 @@ void ht_motor_set_control_cmd(ht_motor_t *motor, uint8_t cmd);
 void ht_motor_get_data(uint8_t id, uint8_t *data);
 void ht_motor_output_data(void);
 
-//void ht_motor_output_single_data(ht_motor_t *motor);
+void ht_motor_output_single_data(ht_motor_t *motor);
 
 #endif
