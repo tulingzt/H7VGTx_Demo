@@ -14,6 +14,7 @@ static list_t object_list = {&object_list, &object_list};
 static uint8_t motor_send_flag[CAN_CHANNEL_NUM][3] = {0};
 can_std_msg_t motor_msg[CAN_CHANNEL_NUM][3];
 
+dji_motor_t fric_motor[2];
 dji_motor_t driver_motor[2];
 dji_motor_t pit_motor, yaw_motor;
 dji_motor_t trigger_motor;

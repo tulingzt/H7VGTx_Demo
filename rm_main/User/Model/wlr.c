@@ -15,8 +15,8 @@
 
 const float LegLengthParam[5] = {0.150f, 0.270f, 0.270f, 0.150f, 0.150f};
 float mb = 4.4f, ml = 2.09f, mw = 0.715f;//机体质量 腿部质量 轮子质量 14.5
-const float BodyWidth = 0.42f;//两轮间距
-const float WheelRadius = 0.06f;//轮子半径
+const float BodyWidth = 0.51f;//两轮间距
+const float WheelRadius = 0.10f;//轮子半径
 const float LegLengthMax = 0.30f, LegLengthMin = 0.10f;
 
 const float LegLengthJump1 = 0.15f;//压腿
@@ -24,10 +24,10 @@ const float LegLengthJump2 = 0.35f;//蹬腿
 const float LegLengthJump3 = 0.24f;//收腿
 const float LegLengthJump4 = 0.22f;//落地
 
-const float LegLengthHightFly = 0.28f;//长腿腿长腾空 0.28
-const float LegLengthFly = 0.23f;//正常腿长腾空
+const float LegLengthHightFly = 0.23f;//长腿腿长腾空 0.28
+const float LegLengthFly = 0.15f;//正常腿长腾空
 const float LegLengthHigh = 0.23f;//长腿 0.23
-const float LegLengthNormal = 0.18f;//正常
+const float LegLengthNormal = 0.15f;//正常
 
 float x3_balance_zero = 0.08f, x5_balance_zero = 0.02f;//腿摆角角度偏置 机体俯仰角度偏置
 float x3_fight_zero = 0.06f;
@@ -154,9 +154,9 @@ void wlr_control(void)
 {
 	//------------------------反馈数据更新------------------------//
     //限制
-    float v_fdb = (kal_v[0].filter_vector[0]+kal_v[1].filter_vector[0])/2.0f;
-    if (fabs(v_fdb) > fabs(wlr.v_set))//加强超速控制
-        wlr.v_set = data_fusion(wlr.v_set, 0, fabs(v_fdb - wlr.v_set));
+//    float v_fdb = (kal_v[0].filter_vector[0]+kal_v[1].filter_vector[0])/2.0f;
+//    if (fabs(v_fdb) > fabs(wlr.v_set))//加强超速控制
+//        wlr.v_set = data_fusion(wlr.v_set, 0, fabs(v_fdb - wlr.v_set));
     if (chassis.mode == CHASSIS_MODE_REMOTER_ROTATE ||
         chassis.mode == CHASSIS_MODE_KEYBOARD_ROTATE) {
         wlr.wz_set = 9;                                                 //小陀螺时固定转速 减小前进
@@ -165,8 +165,8 @@ void wlr_control(void)
         wlr.wz_set = pid_calc(&pid_yaw, wlr.yaw_fdb + wlr.yaw_err, wlr.yaw_fdb);
         wlr.v_set = data_fusion(wlr.v_set, 0, fabs(wlr.wz_fdb)/6.0f);   //限制前进速度 旋转过快
     }
-    wlr.wz_set = data_fusion(wlr.wz_set, 0, fabs(v_fdb/3.0f));          //限制旋转速度 前进过快
-    wlr.wz_set = data_fusion(wlr.wz_set, 0, fabs(wlr.roll_fdb/0.2f));   //限制旋转速度 roll太偏
+//    wlr.wz_set = data_fusion(wlr.wz_set, 0, fabs(v_fdb/3.0f));          //限制旋转速度 前进过快
+//    wlr.wz_set = data_fusion(wlr.wz_set, 0, fabs(wlr.roll_fdb/0.2f));   //限制旋转速度 roll太偏
 	//更新两轮模型
 	twm_feedback_calc(&twm, wlr.side[0].wy, wlr.side[1].wy, wlr.wz_fdb);//输入左右轮子转速
 	twm_reference_calc(&twm, wlr.v_set, wlr.wz_set);//计算两侧轮腿模型的设定速度
@@ -186,8 +186,8 @@ void wlr_control(void)
         wlr.side[i].v_kal = kal_v[i].filter_vector[0];
         wlr.side[i].a_kal = kal_v[i].filter_vector[1];
         
-        lqr[i].X_fdb[1] = kal_v[i].filter_vector[0];
-//		lqr[i].X_fdb[1] = -wlr.side[i].wy * WheelRadius;
+//        lqr[i].X_fdb[1] = kal_v[i].filter_vector[0];
+		lqr[i].X_fdb[1] = -wlr.side[i].wy * WheelRadius;
         //定点控制第一方案
 //        lqr[i].X_fdb[0] += (lqr[i].X_fdb[1] + lqr[i].last_x2) / 2 * CHASSIS_PERIOD_DU * 0.04f;//使用梯形积分速度求位移
         //定点控制第二方案
@@ -215,15 +215,15 @@ void wlr_control(void)
         kalman_filter_update(&kal_fn[i]);
         wlr.side[i].Fn_kal = kal_fn[i].filter_vector[0];
 		//离地检测
-        if(wlr.side[i].Fn_kal < 30.0f)
-            wlr.side[i].fly_cnt++;
-        else if(wlr.side[i].fly_cnt != 0)
-            wlr.side[i].fly_cnt--;
-        if(wlr.side[i].fly_cnt > 30) {
-            wlr.side[i].fly_cnt = 30;
-            wlr.side[i].fly_flag = 1;
-        } else if(wlr.side[i].fly_cnt == 0)
-        wlr.side[i].fly_flag = 0;
+//        if(wlr.side[i].Fn_kal < 30.0f)
+//            wlr.side[i].fly_cnt++;
+//        else if(wlr.side[i].fly_cnt != 0)
+//            wlr.side[i].fly_cnt--;
+//        if(wlr.side[i].fly_cnt > 30) {
+//            wlr.side[i].fly_cnt = 30;
+//            wlr.side[i].fly_flag = 1;
+//        } else if(wlr.side[i].fly_cnt == 0)
+//        wlr.side[i].fly_flag = 0;
 	}
 	//高度选择 跳跃状态改变
 	if (wlr.jump_flag == 1) {//跳跃起跳状态 先压腿
@@ -255,16 +255,17 @@ void wlr_control(void)
         wlr.high_set = LegLengthNormal;
     }
     //限制 旋转压腿长用于解决侧翻 腿摆压腿长用于解决膝关节可能卡地面
-    if (wlr.high_flag) {
-        wlr.high_set = data_fusion(wlr.high_set, 0.90f * wlr.high_set, fabs(wlr.wz_set/6.0f));
-    }
-    wlr.high_set = data_fusion(wlr.high_set, LegLengthMin, (fabs(lqr[0].X_fdb[2])+fabs(lqr[1].X_fdb[2]))/2.0f/2.0f);
+//    if (wlr.high_flag) {
+//        wlr.high_set = data_fusion(wlr.high_set, 0.90f * wlr.high_set, fabs(wlr.wz_set/6.0f));
+//    }
+//    wlr.high_set = data_fusion(wlr.high_set, LegLengthMin, (fabs(lqr[0].X_fdb[2])+fabs(lqr[1].X_fdb[2]))/2.0f/2.0f);
 	//更新两腿模型
 	tlm_gnd_roll_calc(&tlm, -wlr.roll_fdb, vmc[0].L_fdb, vmc[1].L_fdb);//计算地形倾角
 	if (wlr.jump_flag != 0 || (wlr.side[0].fly_flag && wlr.side[1].fly_flag))
 		tlm.l_ref[0] = tlm.l_ref[1] = wlr.high_set;
 	else
         tlm_leg_length_cacl(&tlm, wlr.high_set, 0);//计算腿长设定值
+    tlm.l_ref[0] = tlm.l_ref[1] = wlr.high_set;
 	//------------------------状态选择------------------------//
 	//根据当前状态选择合适的控制矩阵
     if (wlr.ctrl_mode == 2) {//力控
@@ -300,7 +301,7 @@ void wlr_control(void)
     } else {
         wlr.q0_offs   = pid_calc(&pid_q0, vmc[0].q_fdb[0], vmc[1].q_fdb[0]);//双腿摆角同步控制
     }
-	wlr.roll_offs = pid_calc(&pid_roll, wlr.roll_set, wlr.roll_fdb);
+//	wlr.roll_offs = pid_calc(&pid_roll, wlr.roll_set, wlr.roll_fdb);
 //    wlr.wx_set = pid_calc(&pid_roll, wlr.roll_set, wlr.roll_fdb);
 //    wlr.roll_offs = pid_calc(&pid_wx, wlr.wx_set, wlr.wx_fdb);
     if (wlr.side[0].fly_flag && wlr.side[1].fly_flag) {//腾空
@@ -331,7 +332,7 @@ void wlr_control(void)
 			wlr.side[i].Fy = pid_calc(&pid_leg_length_fast[i], tlm.l_ref[i], vmc[i].L_fdb);
 		} else																//常态 跳跃压腿阶段 跳跃落地阶段
 			wlr.side[i].Fy = pid_calc(&pid_leg_length[i], tlm.l_ref[i], vmc[i].L_fdb)\
-                                 + 27 + WLR_SIGN(i) * wlr.roll_offs;
+                                 + 0 + WLR_SIGN(i) * wlr.roll_offs;
 		wlr.side[i].T0 = -lqr[i].U_ref[0] / 2 + WLR_SIGN(i) * wlr.q0_offs;	//两条腿时，LQR输出力矩需要除以2
 		vmc_inverse_solution(&vmc[i], wlr.high_set, wlr.q0_set, wlr.side[i].T0, wlr.side[i].Fy);
 	}

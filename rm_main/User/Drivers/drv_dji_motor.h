@@ -68,6 +68,7 @@ typedef struct
     int32_t	 round_cnt;                 //已转圈数
 } dji_motor_t;
 
+extern dji_motor_t fric_motor[2];
 extern dji_motor_t driver_motor[2];
 extern dji_motor_t pit_motor, yaw_motor;
 extern dji_motor_t trigger_motor;
