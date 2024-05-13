@@ -20,7 +20,7 @@
 
 us_time_t test_time;
 kalman_filter_t test;
-uint8_t debug_wave = 11;
+uint8_t debug_wave = 12;
 
 void log_scope_data_pkg(void)
 {
@@ -128,6 +128,15 @@ void log_scope_data_pkg(void)
             log_scope_get_data(wlr.roll_fdb);
             log_scope_get_data(wlr.wx_set);
             log_scope_get_data(wlr.wx_fdb);
+        } case 12: {
+            log_scope_get_data(chassis_imu.pit);
+            log_scope_get_data(chassis_imu.wy);
+            log_scope_get_data(chassis_imu.yaw);
+            log_scope_get_data(chassis_imu.wz);
+            log_scope_get_data(chassis_imu.rol);
+            log_scope_get_data(chassis_imu.wx);
+            log_scope_get_data(chassis_imu.ax);
+            log_scope_get_data(chassis_imu.az);
         }default:break;
     }
 }

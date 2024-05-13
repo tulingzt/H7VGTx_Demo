@@ -24,9 +24,9 @@ const float LegLengthJump2 = 0.35f;//蹬腿
 const float LegLengthJump3 = 0.24f;//收腿
 const float LegLengthJump4 = 0.22f;//落地
 
-const float LegLengthHightFly = 0.23f;//长腿腿长腾空 0.28
-const float LegLengthFly = 0.15f;//正常腿长腾空
-const float LegLengthHigh = 0.23f;//长腿 0.23
+const float LegLengthHightFly = 0.20f;//长腿腿长腾空 0.28
+const float LegLengthFly = 0.20f;//正常腿长腾空
+const float LegLengthHigh = 0.15f;//长腿 0.23
 const float LegLengthNormal = 0.15f;//正常
 
 float x3_balance_zero = 0.08f, x5_balance_zero = 0.02f;//腿摆角角度偏置 机体俯仰角度偏置
@@ -129,7 +129,7 @@ void wlr_init(void)
         kal_v[i].Q_data[0] = 0.01f; kal_v[i].Q_data[3] = 0.01f;
         kal_v[i].R_data[0] = 1.0f; kal_v[i].R_data[3] = 10.0f;
 		//PID参数初始化
-		pid_init(&pid_leg_length[i], NONE, 500, 0.0f, 20000, 10, 20);//i 2.5f
+		pid_init(&pid_leg_length[i], NONE, 500, 2.5f, 20000, 25, 50);//i 2.5f
 		pid_init(&pid_leg_length_fast[i], NONE, 1000, 0, 10000, 30, 50);
 	}
 	//卡尔曼滤波器初始化
@@ -265,7 +265,6 @@ void wlr_control(void)
 		tlm.l_ref[0] = tlm.l_ref[1] = wlr.high_set;
 	else
         tlm_leg_length_cacl(&tlm, wlr.high_set, 0);//计算腿长设定值
-    tlm.l_ref[0] = tlm.l_ref[1] = wlr.high_set;
 	//------------------------状态选择------------------------//
 	//根据当前状态选择合适的控制矩阵
     if (wlr.ctrl_mode == 2) {//力控
