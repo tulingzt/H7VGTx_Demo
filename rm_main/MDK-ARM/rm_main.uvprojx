@@ -938,26 +938,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>User/Middle</GroupName>
-          <Files>
-            <File>
-              <FileName>cover_ctrl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Middle\cover_ctrl.c</FilePath>
-            </File>
-            <File>
-              <FileName>fric_ctrl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Middle\fric_ctrl.c</FilePath>
-            </File>
-            <File>
-              <FileName>trigger_ctrl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Middle\trigger_ctrl.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>User/Drivers</GroupName>
           <Files>
             <File>

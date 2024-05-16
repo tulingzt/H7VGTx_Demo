@@ -60,12 +60,13 @@ void vision_output_data(void)
     vision.tx.data.imu_pit_spd = -gimbal_imu.wy / PI * 180;
     vision.tx.data.imu_yaw_spd = gimbal_imu.wz / PI * 180;
     
-    switch (shoot.shoot_speed_ref) {
-        case 15: vision.tx.data.shooter_speed = 1;break;
-        case 18: vision.tx.data.shooter_speed = 2;break;
-        case 30: vision.tx.data.shooter_speed = 3;break;
-        default: vision.tx.data.shooter_speed = 3;break;
-    }
+//    switch (shoot.shoot_speed_ref) {
+//        case 15: vision.tx.data.shooter_speed = 1;break;
+//        case 18: vision.tx.data.shooter_speed = 2;break;
+//        case 30: vision.tx.data.shooter_speed = 3;break;
+//        default: vision.tx.data.shooter_speed = 3;break;
+//    }
+    vision.tx.data.shooter_speed = 3;
     
     vision.tx.data.aiming_mode = 1;
     vision.tx.data.vacancy = 0;

@@ -113,10 +113,10 @@ void can_comm_init(void)
     tx_message.MessageMarker = 0;
     
     //各驱动初始化
-    ht_motor_init(&joint_motor[0], CAN_CHANNEL_1, 0x01, 0.64f);
-    ht_motor_init(&joint_motor[1], CAN_CHANNEL_1, 0x02, 0.78f);
-    ht_motor_init(&joint_motor[2], CAN_CHANNEL_1, 0x03, 0.77f);
-    ht_motor_init(&joint_motor[3], CAN_CHANNEL_1, 0x04, 0.65f);
+    ht_motor_init(&joint_motor[0], CAN_CHANNEL_1, 0x01, 0.74f);
+    ht_motor_init(&joint_motor[1], CAN_CHANNEL_1, 0x02, 0.75f);
+    ht_motor_init(&joint_motor[2], CAN_CHANNEL_1, 0x03, 0.73f);
+    ht_motor_init(&joint_motor[3], CAN_CHANNEL_1, 0x04, 0.74f);
 
     dji_motor_init(&fric_motor[0], DJI_3508_MOTOR, CAN_CHANNEL_3, 0x201, 1.0f);
     dji_motor_init(&fric_motor[1], DJI_3508_MOTOR, CAN_CHANNEL_3, 0x202, 1.0f);

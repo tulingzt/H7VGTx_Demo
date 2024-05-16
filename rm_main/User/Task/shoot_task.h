@@ -20,6 +20,13 @@ typedef enum
     TRIGGER_MODE_SERIES
 } shoot_trigger_mode_e;
 
+typedef enum
+{
+    FRIC_MODE_PROTECT,
+    FRIC_MODE_STOP,
+    FRIC_MODE_RUN
+} shoot_fric_mode_e;
+
 typedef struct
 {
     float fdb;//射速反馈置（m/s）
@@ -42,13 +49,15 @@ typedef struct
 
 typedef struct
 {
-    shoot_trigger_mode_e trigger_mode;
-    shoot_pid_t          trigger_ecd, trigger_spd;
-    float                trigger_output;        //发射器力矩
+    shoot_trigger_mode_e trigger_mode;      //模式
+    shoot_fric_mode_e    fric_mode;
+
+    shoot_pid_t          trigger_ecd, trigger_spd, fric_spd[2];
+    float                trigger_output, fric_output[2];
+
     barrel_param_t       barrel;
-    uint16_t             shoot_speed_ref;    //射速设定值（m/s）
-    float                trigger_period;	    //拨盘拨出一颗子弹的周期，体现射频
-    uint8_t              shoot_speed_vision; //发给视觉的射速档位
+    float                fric_speed_set;     //摩擦轮转速(rad/s)
+    float                trigger_period;	 //拨盘拨出一颗子弹的周期，体现射频
 } shoot_t;
 
 extern shoot_t shoot;

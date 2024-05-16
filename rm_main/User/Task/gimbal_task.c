@@ -25,10 +25,11 @@ static void gimbal_init(void)
     pid_init(&gimbal.yaw_angle.pid, NONE, 20, 0, 300, 0, 15);
     pid_init(&gimbal.yaw_spd.pid, NONE, 0.5f, 0.006f, 0, 0.6f, 1.3f);
 
-    pid_init(&gimbal.pit_angle.pid, NONE, 30, 0, 300, 0, 15);
-    pid_init(&gimbal.pit_spd.pid, NONE, -0.3f, -0.003f, 0, 0.6f, 1.3f);
-    
-    float yaw_feed_c[3] = {100, 0, 0};
+//    pid_init(&gimbal.pit_angle.pid, NONE, 30, 0, 300, 0, 15);
+//    pid_init(&gimbal.pit_spd.pid, NONE, -0.3f, -0.003f, 0, 0.6f, 1.3f);
+    pid_init(&gimbal.pit_angle.pid, NONE, 10, 0, 100, 0, 15);
+    pid_init(&gimbal.pit_spd.pid, NONE, -0.2f, -0.003f, 0, 0.3f, 1.3f);
+    float yaw_feed_c[3] = {50, 0, 0};
     feed_forward_init(&gimbal.yaw_feedforward, 0.002f, 2, yaw_feed_c, 0);
 }
 
@@ -39,13 +40,13 @@ static void gimbal_pid_calc(void)
     //速度环反馈 陀螺仪
     //此yaw_err用于云台pit限幅
     yaw_err = circle_error(CHASSIS_YAW_OFFSET / 8192.0f * 2 * PI, yaw_motor.ecd / 8192.0f * 2 * PI, 2 * PI);
-    pit_max = arm_cos_f32(yaw_err) * chassis_imu.pit + 0.3f;
-    pit_min = arm_cos_f32(yaw_err) * chassis_imu.pit - 0.6f;
+    pit_max = -arm_cos_f32(yaw_err) * chassis_imu.pit + 0.4f;
+    pit_min = -arm_cos_f32(yaw_err) * chassis_imu.pit - 0.7f;
     data_limit(&gimbal.pit_angle.ref, pit_min, pit_max);
     gimbal.pit_angle.fdb = -gimbal_imu.pit;
     gimbal.pit_spd.ref = pid_calc(&gimbal.pit_angle.pid, gimbal.pit_angle.ref, gimbal.pit_angle.fdb);
     gimbal.pit_spd.fdb = -gimbal_imu.wy - arm_cos_f32(yaw_err) * chassis_imu.wy;
-    gimbal.pit_output = 0.05f + pid_calc(&gimbal.pit_spd.pid, gimbal.pit_spd.ref, gimbal.pit_spd.fdb);
+    gimbal.pit_output = pid_calc(&gimbal.pit_spd.pid, gimbal.pit_spd.ref, gimbal.pit_spd.fdb);
 
     if (gimbal.yaw_angle.ref < 0) {
         gimbal.yaw_angle.ref += 2 * PI;
@@ -117,17 +118,13 @@ void gimbal_task(void const *argu)
                     gimbal.yaw_angle.ref = gimbal_imu.yaw;
                     gimbal.last_yaw_ref = gimbal.yaw_angle.ref;
                     gimbal.pit_angle.ref = 0;
-//                 gimbal.pit_ecd.ref = GIMBAL_PIT_CENTER_OFFSET;
-//                 gimbal.yaw_ecd.ref = GIMBAL_YAW_CENTER_OFFSET;
                     gimbal.pit_output = 0;
                     gimbal.yaw_output = 0;
                 }
                 break;
             }
             case REMOTER_MODE: {
-////                gimbal.pit_ecd.ref -= rc.ch2 * gimbal_scale.ecd_remote;
 //                gimbal.pit_angle.ref -= rc.ch2 * gimbal_scale.angle_remote;
-////                gimbal.yaw_ecd.ref -= rc.ch1 * gimbal_scale.ecd_remote;
 //                gimbal.yaw_angle.ref -= rc.ch1 * gimbal_scale.angle_remote;
                 gimbal_get_vision_data();
                 gimbal_pid_calc();
@@ -137,20 +134,15 @@ void gimbal_task(void const *argu)
                 if (rc.mouse.r == 1) {
                     gimbal_get_vision_data();
                 } else {
-                    if (kb_status[KEY_SHOOT_HOUSE]) { //补弹
-                        gimbal.pit_angle.ref = 0;
-                        gimbal.yaw_angle.ref -= rc.mouse.x * gimbal_scale.angle_keyboard * 0.5f;
-                    } else {
-                        //一键调头
-                        if(key_scan_clear(KEY_GIMBAL_TURN_R)) {
-                            gimbal.yaw_angle.ref -= PI/2;
-                        } 
-                        else if (key_scan_clear(KEY_GIMBAL_TURN_L)) {
-                            gimbal.yaw_angle.ref += PI/2;
-                        }
-                        gimbal.pit_angle.ref += rc.mouse.y * gimbal_scale.angle_keyboard * 0.5f;
-                        gimbal.yaw_angle.ref -= rc.mouse.x * gimbal_scale.angle_keyboard;
+                    //一键调头
+                    if(key_scan_clear(KEY_GIMBAL_TURN_R)) {
+                        gimbal.yaw_angle.ref -= PI/2;
+                    } 
+                    else if (key_scan_clear(KEY_GIMBAL_TURN_L)) {
+                        gimbal.yaw_angle.ref += PI/2;
                     }
+                    gimbal.pit_angle.ref += rc.mouse.y * gimbal_scale.angle_keyboard * 0.5f;
+                    gimbal.yaw_angle.ref -= rc.mouse.x * gimbal_scale.angle_keyboard;
                 }
                 gimbal_pid_calc();
                 break;

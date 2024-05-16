@@ -18,8 +18,8 @@ typedef struct
 
 typedef struct
 {
-    gimbal_pid_t yaw_angle, yaw_spd, yaw_ecd;
-    gimbal_pid_t pit_angle, pit_spd, pit_ecd;
+    gimbal_pid_t yaw_angle, yaw_spd;
+    gimbal_pid_t pit_angle, pit_spd;
     feed_forward_t yaw_feedforward;
     float yaw_output, pit_output;
     float last_yaw_ref;

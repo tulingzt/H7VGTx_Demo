@@ -19,8 +19,8 @@ void imu_get_data(imu_t *imu, uint32_t id, uint8_t *data)
     memcpy(buffer, data, 8);
     switch(id) {
     case IMU_PIT_ID: {
-        imu->pit = -1.0f * buffer[0] * PI / 180;
-        imu->wy = -1.0f * buffer[1] / 16.384f * PI / 180;
+        imu->pit = 1.0f * buffer[0] * PI / 180;
+        imu->wy = 1.0f * buffer[1] / 16.384f * PI / 180;
         break;
     }
     case IMU_YAW_ID: {

@@ -8,10 +8,6 @@
 
 #include "wlr.h"
 
-#include "trigger_ctrl.h"
-#include "fric_ctrl.h"
-#include "cover_ctrl.h"
-
 #include "prot_dr16.h"
 
 #include "stm32h7xx_hal.h"
@@ -61,21 +57,21 @@ void read_status(void)
         rgb_change(4,0);
     }
     
-    if (fric.mode == FIRC_MODE_RUN) {
-        if (shoot.trigger_mode == TRIGGER_MODE_SINGLE || shoot.trigger_mode == TRIGGER_MODE_SERIES) {
-            rgb_change(5,1);
-        } else {
-            rgb_change(5,7);
-        }
-    } else {
-        rgb_change(5,0);
-    }
+//    if (fric.mode == FIRC_MODE_RUN) {
+//        if (shoot.trigger_mode == TRIGGER_MODE_SINGLE || shoot.trigger_mode == TRIGGER_MODE_SERIES) {
+//            rgb_change(5,1);
+//        } else {
+//            rgb_change(5,7);
+//        }
+//    } else {
+//        rgb_change(5,0);
+//    }
     
-    if (house_mode == HOUSE_MODE_OPEN) {
-        rgb_change(6,1);
-    } else {
-        rgb_change(6,0);
-    }
+//    if (house_mode == HOUSE_MODE_OPEN) {
+//        rgb_change(6,1);
+//    } else {
+//        rgb_change(6,0);
+//    }
 }
 
 void rgb_task(void const *argu)
