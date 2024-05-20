@@ -10,9 +10,7 @@
 
 #define SHOOT_SPEED_NUM 15
 #define ABS(x) ((x>0)? (x): (-(x)))
-
 #define TRIGGER_MOTOR_ECD   36859.0f  //拨盘一颗子弹转过的编码值 8191 * 36 / 8 = 36859.5f
-#define ABS(x) ((x>0)? (x): (-(x)))
 
 float MIN_HEAT = 30;        //热量控制裕量
 
@@ -46,7 +44,8 @@ static uint8_t series_shoot_enable(void)
     return (
 //        ((ctrl_mode == REMOTER_MODE)
         ((ctrl_mode == REMOTER_MODE && vision.shoot_enable)// && vision.shoot_enable
-            || (ctrl_mode == PROTECT_MODE && (rc.sw2 == RC_MI || rc.sw2 == RC_DN) && vision.shoot_enable)
+            || (ctrl_mode == PROTECT_MODE && rc.sw2 == RC_DN)
+//            || (ctrl_mode == PROTECT_MODE && rc.sw2 == RC_DN && vision.shoot_enable)
             || (ctrl_mode == KEYBOARD_MODE && rc.mouse.l && rc.mouse.r && vision.shoot_enable)
             || (ctrl_mode == KEYBOARD_MODE && rc.mouse.l && rc.mouse.r == 0)
         )
@@ -70,6 +69,9 @@ static void shoot_control(void)
         case TRIGGER_MODE_STOP: { //拨盘停止模式，保持静止，有力
             frequency_cnt = 0; //计时变量置0，打出当前一发，禁止
             shoot.barrel.shoot_period = 0;
+            
+            shoot.trigger_ecd.ref = trigger_motor.total_ecd;
+            shoot.trigger_spd.pid.i_out = 0;
             break;
         }
         case TRIGGER_MODE_SINGLE: { //拨盘单发模式，连续开枪请求，只响应一次
@@ -126,7 +128,7 @@ static void shoot_init(void)
     shoot.fric_mode     = FRIC_MODE_PROTECT;
     //枪管参数初始化
     shoot.trigger_period = TRIGGER_PERIOD;
-    shoot.fric_speed_set = 500;
+    shoot.fric_speed_set = 900;
     shoot.barrel.cooling_rate   = 10;
     shoot.barrel.heat_max       = 50;
     //历史射速反馈缓存区
@@ -196,6 +198,7 @@ static void shoot_mode_switch(void)
     switch (ctrl_mode) {
         case PROTECT_MODE: 
         case REMOTER_MODE: {
+            shoot.trigger_period = TRIGGER_PERIOD;
             /* 摩擦轮和拨盘模式切换 */
             switch (rc.sw2) {
                 case RC_UP: {
@@ -222,6 +225,11 @@ static void shoot_mode_switch(void)
             break;
         }
         case KEYBOARD_MODE: {
+            /* 射频切换 */
+            if (rc.mouse.r)
+                shoot.trigger_period = TRIGGER_PERIOD2;
+            else
+                shoot.trigger_period = TRIGGER_PERIOD;
             /* 摩擦轮模式切换 */
             if (robot_status.power_management_shooter_output) {  //发射机构得到供电 
                 shoot.fric_mode = FRIC_MODE_RUN;  //开关摩擦轮         
@@ -230,11 +238,7 @@ static void shoot_mode_switch(void)
             }
             /* 拨盘模式切换 */
             if (shoot.fric_mode == FRIC_MODE_RUN) {  //开摩擦轮
-//                if (vision.mode == vMODE_bENERGY || vision.mode == vMODE_sENERGY) {  //能量机关 单发模式
-//                    shoot.trigger_mode = TRIGGER_MODE_SINGLE;
-//                } else {  //其他模式 连发模式
-                    shoot.trigger_mode = TRIGGER_MODE_SERIES;
-//                }
+                shoot.trigger_mode = TRIGGER_MODE_SERIES;
             } else {
                 shoot.trigger_mode = TRIGGER_MODE_STOP;
             }

@@ -22,7 +22,7 @@ ramp_t chassis_y_ramp;
 
 chassis_t chassis;
 chassis_scale_t chassis_scale = {
-    .remote = 1.0f/660*2,
+    .remote = 1.0f/660*2.0f,
     .keyboard = 3
 };
 
@@ -143,6 +143,9 @@ static void chassis_mode_switch(void)
                 chassis.mode = CHASSIS_MODE_REMOTER_ROTATE;
             }
         }
+//        if (rc.ch5 == 660 && wlr.jump_flag == 0) {
+//            wlr.jump_flag = 1;
+//        }
         /* 遥控器注释底盘 */
         if (rc_fsm_check(RC_RIGHT_RD) || rc_fsm_check(RC_LEFT_LD) || rc_fsm_check(RC_LEFT_RD)) { //遥控器注释底盘
             chassis.mode = CHASSIS_MODE_PROTECT;
@@ -244,9 +247,9 @@ static void chassis_data_input(void)
                 wlr.ctrl_mode = 1; //锁腿开轮
            //高度模式
            if (wlr.ctrl_mode == 2) {  //轮腿模式下才可控制腿长
-//               if(rc.sw2 == RC_MI)
-//                   wlr.high_flag = 0;
-//               else if(rc.sw2 == RC_DN)
+               if(rc.sw2 == RC_MI)
+                   wlr.high_flag = 0;
+               else if(rc.sw2 == RC_DN)
                    wlr.high_flag = 1;
            } else {
                wlr.high_flag = 0;

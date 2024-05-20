@@ -26,17 +26,17 @@ void log_scope_data_pkg(void)
 {
     switch(debug_wave) {
         case 1: {//云台pid调试
-            log_scope_get_data(gimbal.yaw_spd.ref);
-            log_scope_get_data(gimbal.yaw_spd.fdb);
-            log_scope_get_data(gimbal.yaw_angle.ref);
-            log_scope_get_data(gimbal.yaw_angle.fdb);
+//            log_scope_get_data(gimbal.yaw_spd.ref);
+//            log_scope_get_data(gimbal.yaw_spd.fdb);
+//            log_scope_get_data(gimbal.yaw_angle.ref);
+//            log_scope_get_data(gimbal.yaw_angle.fdb);
 //            log_scope_get_data(gimbal.yaw_output);
 //            log_scope_get_data(yaw_motor.tx_current);
             
-//            log_scope_get_data(gimbal.pit_spd.ref);
-//            log_scope_get_data(gimbal.pit_spd.fdb);
-//            log_scope_get_data(gimbal.pit_angle.ref);
-//            log_scope_get_data(gimbal.pit_angle.fdb);
+            log_scope_get_data(gimbal.pit_spd.ref);
+            log_scope_get_data(gimbal.pit_spd.fdb);
+            log_scope_get_data(gimbal.pit_angle.ref);
+            log_scope_get_data(gimbal.pit_angle.fdb);
 //            log_scope_get_data(gimbal.pit_output);
 //            log_scope_get_data(pit_motor.tx_current);
             break;
@@ -49,10 +49,10 @@ void log_scope_data_pkg(void)
 //            log_scope_get_data(trigger_motor.tx_current);
             break;
         } case 3: {//底盘yaw roll调试
-//            log_scope_get_data(wlr.wz_set);
-//            log_scope_get_data(wlr.wz_fdb);
-//            log_scope_get_data(wlr.yaw_fdb + wlr.yaw_err);
-//            log_scope_get_data(wlr.yaw_fdb);
+            log_scope_get_data(wlr.wz_set);
+            log_scope_get_data(wlr.wz_fdb);
+            log_scope_get_data(wlr.yaw_fdb + wlr.yaw_err);
+            log_scope_get_data(wlr.yaw_fdb);
             
 //            log_scope_get_data(wlr.roll_set);
 //            log_scope_get_data(wlr.roll_fdb);
@@ -137,6 +137,16 @@ void log_scope_data_pkg(void)
             log_scope_get_data(chassis_imu.wx);
             log_scope_get_data(chassis_imu.ax);
             log_scope_get_data(chassis_imu.az);
+        } case 13: {
+            log_scope_get_data(wlr.side[0].Tw);
+            log_scope_get_data(wlr.side[1].Tw);
+            log_scope_get_data(driver_motor[0].tx_current);
+            log_scope_get_data(driver_motor[1].tx_current);
+        } case 14: {
+            log_scope_get_data(shoot.fric_spd[0].fdb);
+            log_scope_get_data(shoot.fric_spd[0].ref);
+            log_scope_get_data(shoot.fric_spd[1].fdb);
+            log_scope_get_data(shoot.fric_spd[1].ref);
         }default:break;
     }
 }

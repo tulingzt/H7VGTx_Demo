@@ -56,7 +56,7 @@ typedef struct
     //控制数据
     float t;
     //反馈数据
-    float position, velocity, torque;   //rad rad/s N*m
+    float position, velocity, torque;   //rad rad/s rad/s/s N*m
     //中间数据
     uint16_t ecd;                       //当前编码值         单位：ecd 0~8191
     int16_t  speed_rpm;                 //转速               单位：rpm
