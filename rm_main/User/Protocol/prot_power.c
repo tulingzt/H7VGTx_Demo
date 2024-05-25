@@ -18,6 +18,8 @@ void power_init(void)
     supercap.max_volage              = 23.6f;
     supercap.limit_volage            = 20.0f;
     supercap.min_volage              = 13.5f;
+    supercap.volume_percent          = 0;
+    supercap.volage                  = supercap.min_volage;
 }
 
 void power_judge_update(void)

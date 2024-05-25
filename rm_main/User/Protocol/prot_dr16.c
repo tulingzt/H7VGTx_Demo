@@ -27,8 +27,6 @@ uint8_t dr16_get_data(dr16_t *rc, uint8_t *data)
     rc->ch1 -= 1024;
     rc->ch2 = (data[1] >> 3 | data[2]  << 5) & 0x07FF;
     rc->ch2 -= 1024;
-    if (ABS(rc->ch2) < 10)
-        rc->ch2 = 0;
     rc->ch3 = (data[2] >> 6 | data[3]  << 2 | data[4] << 10) & 0x07FF;
     rc->ch3 -= 1024;
     rc->ch4 = (data[4] >> 1 | data[5]  << 7) & 0x07FF;

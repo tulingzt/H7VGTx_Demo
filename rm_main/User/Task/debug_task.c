@@ -20,7 +20,7 @@
 
 us_time_t test_time;
 kalman_filter_t test;
-uint8_t debug_wave = 5;
+uint8_t debug_wave = 1;
 
 void log_scope_data_pkg(void)
 {
@@ -28,13 +28,13 @@ void log_scope_data_pkg(void)
         case 1: {//云台pid调试
 //            log_scope_get_data(gimbal.yaw_spd.ref);
 //            log_scope_get_data(gimbal.yaw_spd.fdb);
-//            log_scope_get_data(gimbal.yaw_angle.ref);
-//            log_scope_get_data(gimbal.yaw_angle.fdb);
+            log_scope_get_data(gimbal.yaw_angle.ref);
+            log_scope_get_data(gimbal.yaw_angle.fdb);
 //            log_scope_get_data(gimbal.yaw_output);
 //            log_scope_get_data(yaw_motor.tx_current);
             
-            log_scope_get_data(gimbal.pit_spd.ref);
-            log_scope_get_data(gimbal.pit_spd.fdb);
+//            log_scope_get_data(gimbal.pit_spd.ref);
+//            log_scope_get_data(gimbal.pit_spd.fdb);
             log_scope_get_data(gimbal.pit_angle.ref);
             log_scope_get_data(gimbal.pit_angle.fdb);
 //            log_scope_get_data(gimbal.pit_output);

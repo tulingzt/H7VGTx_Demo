@@ -1,4 +1,5 @@
 #include "prot_judge.h"
+#include "ui_interface.h"
 #include "cmsis_os.h"
 #include "string.h"
 #include "crc.h"
@@ -86,7 +87,7 @@ uint8_t judge_get_data(uint8_t *data)
                         case ID_ext_supply_projectile_action : memcpy(&ext_supply_projectile_action, (data + 7), LEN_ext_supply_projectile_action);break;
                         case ID_referee_warning              : memcpy(&referee_warning             , (data + 7), LEN_referee_warning             );break;
                         case ID_dart_info                    : memcpy(&dart_info                   , (data + 7), LEN_dart_info                   );break;
-                        case ID_robot_status                 : memcpy(&robot_status                , (data + 7), LEN_robot_status                );break;
+                        case ID_robot_status                 : memcpy(&robot_status                , (data + 7), LEN_robot_status                );ui_self_id=robot_status.robot_id;break;
                         case ID_power_heat_data              : memcpy(&power_heat_data             , (data + 7), LEN_power_heat_data             );cnt_test++;break;
                         case ID_robot_pos                    : memcpy(&robot_pos                   , (data + 7), LEN_robot_pos                   );break;
                         case ID_buff                         : memcpy(&buff                        , (data + 7), LEN_buff                        );break;
@@ -127,51 +128,11 @@ void judge_init(UART_HandleTypeDef *huart)
 
 /*
  * @brief     发送裁判数据
- * @param[in] frame_header: 帧头结构体
- * @param[in] cmd_id      : 帧id
- * @param[in] data        : 数据指针
- * @retval    void
  */
-uint8_t send_data[150];
-//static void judge_send_data(frame_header_t *frame_header, cmd_id_e cmd_id, uint8_t *data)
-//{
-//    //如果串口对应的DMA还未发送完就等待，防止变量UartTxBuf被CPU和DMA同时使用。
-//    //发送裁判系统数据不用急
-//    while (judge_huart->gState != HAL_UART_STATE_READY) {
-//        osDelay(1);
-//    }
-//    memcpy(send_data, frame_header, 5);//写入帧头数据
-//    send_data[5] = cmd_id >> 8;//写入id
-//    send_data[6] = cmd_id & 0x0f;
-//    memcpy(send_data + 7, data, frame_header->data_length);
-//    crc16_set_checksum(send_data, frame_header->data_length + 9);
-//    HAL_UART_Transmit_DMA(judge_huart, send_data, frame_header->data_length + 9);
-//}
-
-/*
- * @brief     发送机器人交互数据
- * @param[in] rcv_id: 接收方id
- * @param[in] id    : 子数据id
- * @param[in] len   : 子数据长度
- * @param[in] data  : 子数据指针
- * @retval    void
- */
-//static void robot_interaction_send_data(uint16_t rcv_id, robot_interaction_id_e id, robot_interaction_len_e len, uint8_t *data)
-//{
-//    frame_header_t frame_header;
-//    robot_interaction_data_t robot_interaction_data;
-//    frame_header.SOF = 0xA5;
-//    frame_header.data_length = len + 6;
-//    frame_header.seq = 0;
-//    crc8_set_checksum((uint8_t *)&frame_header, 5);
-//    robot_interaction_data.data_cmd_id = id;
-//    //发送接收id设置
-//    robot_interaction_data.sender_id = robot_status.robot_id;
-//    robot_interaction_data.receiver_id = rcv_id;
-//    
-//    memcpy((uint8_t *)&robot_interaction_data, data, len);
-//    
-//    judge_send_data(&frame_header, 0x0301, (uint8_t *)&robot_interaction_data);
-//}
-
-
+void judge_send_data(uint8_t* message, int length)
+{
+    while (judge_huart->gState != HAL_UART_STATE_READY) {
+        osDelay(1);
+    }
+    HAL_UART_Transmit_DMA(judge_huart, message, length);
+}

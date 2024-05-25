@@ -105,6 +105,7 @@ static void chassis_init()
     ramp_init(&chassis_x_ramp, 0.02f, -chassis_scale.keyboard, chassis_scale.keyboard);//0.02 0.1s达到最大
     ramp_init(&chassis_y_ramp, 0.02f, -chassis_scale.keyboard, chassis_scale.keyboard);
     wlr.yaw_set = (float)CHASSIS_YAW_OFFSET / 8192 * 2 * PI;
+    wlr.yaw_offset = 2.0f;
 }
 
 static void chassis_mode_switch(void)
@@ -114,9 +115,10 @@ static void chassis_mode_switch(void)
     /* 按键扫描 */
     key_scan(KEY_CHASSIS_ROTATE);
     key_scan(KEY_CHASSIS_POWER);
-    key_scan(KB_CTRL);
+    key_scan(KEY_CHASSIS_MIDSPEED);
     key_scan(KEY_CHASSIS_LOWSPEED);
     key_scan(KEY_CHASSIS_HEIGHT);
+    key_scan(KEY_CHASSIS_HEIGHT2);
     key_scan(KEY_CHASSIS_FIGHT);
     key_scan(KEY_CHASSIS_PRONE);
     key_scan(KEY_CHASSIS_UNFOLLOW);
@@ -156,7 +158,7 @@ static void chassis_mode_switch(void)
         /* 底盘模式切换 */
         switch (chassis.mode) {
         case CHASSIS_MODE_KEYBOARD_FOLLOW: { //键盘跟随模式下
-            if(kb_status[KEY_CHASSIS_PRONE] && !wlr.high_flag) { //趴倒模式
+            if(kb_status[KEY_CHASSIS_PRONE]) { //趴倒模式
                 chassis.mode = CHASSIS_MODE_KEYBOARD_PRONE;
             } else if (kb_status[KEY_CHASSIS_ROTATE]) { //进入键盘陀螺模式
                 chassis.mode = CHASSIS_MODE_KEYBOARD_ROTATE;
@@ -199,6 +201,7 @@ static void chassis_mode_switch(void)
         case CHASSIS_MODE_KEYBOARD_PRONE: {
             if(!kb_status[KEY_CHASSIS_PRONE]) { //趴倒模式
                 wlr.prone_flag = 0;
+                wlr.high_flag = 0;
                 chassis.mode = CHASSIS_MODE_KEYBOARD_FOLLOW;
             }
             break;
@@ -268,19 +271,20 @@ static void chassis_data_input(void)
             //高速模式
             if (chassis.mode == CHASSIS_MODE_KEYBOARD_FIGHT) {
                 chassis_scale.keyboard = 1.0f;  //迎敌模式下
-            } else if (kb_status[KB_CTRL] == KEY_RUN) {
-                chassis_scale.keyboard = 2.5f;  //高速模式下
-                key_status_clear(KEY_CHASSIS_LOWSPEED);
-                key_status_clear(KEY_CHASSIS_POWER);
-            } else if (kb_status[KEY_CHASSIS_POWER] == KEY_RUN) {
-                chassis_scale.keyboard = 3.0f;  //高速模式下
+            } else if (kb_status[KEY_CHASSIS_MIDSPEED] == KEY_RUN) {
+                chassis_scale.keyboard = 2.6f;  //高速模式下
                 key_status_clear(KEY_CHASSIS_LOWSPEED);
             } else if (kb_status[KEY_CHASSIS_LOWSPEED] == KEY_RUN) {
                 chassis_scale.keyboard = 1.0f;  //低速模式下
             } else {
                 chassis_scale.keyboard = 2.0f;  //普通模式下
             }
-
+            //超速模式
+            if (kb_status[KEY_CHASSIS_POWER] == KEY_RUN) {
+                wlr.shift_flag = 1;
+            } else {
+                wlr.shift_flag = 0;
+            }
             //速度输入
             chassis_ramp();
             chassis.input.vx = chassis_x_ramp.out;
@@ -291,13 +295,56 @@ static void chassis_data_input(void)
                 wlr.prone_flag = 1;
             }
             //高度模式
-            if(kb_status[KEY_CHASSIS_HEIGHT] == KEY_RUN && 
-                chassis.mode != CHASSIS_MODE_KEYBOARD_PRONE) {
-                wlr.high_flag = 1;  //趴倒模式不能起
+            if (wlr.high_flag == 0) {
+                if (kb_status[KEY_CHASSIS_HEIGHT] == KEY_RUN && 
+                    chassis.mode != CHASSIS_MODE_KEYBOARD_PRONE) {
+                    wlr.high_flag = 1;
+                }
+                if (kb_status[KEY_CHASSIS_HEIGHT2] == KEY_RUN && 
+                    chassis.mode != CHASSIS_MODE_KEYBOARD_PRONE) {
+                    wlr.high_flag = 2;
+                }
+            } else if (wlr.high_flag == 1) {
+                if (kb_status[KEY_CHASSIS_HEIGHT2] == KEY_RUN && 
+                    chassis.mode != CHASSIS_MODE_KEYBOARD_PRONE) {
+                    wlr.high_flag = 2;
+                    key_status_clear(KEY_CHASSIS_HEIGHT);
+                } else if (kb_status[KEY_CHASSIS_HEIGHT] != KEY_RUN ||
+                    chassis.mode == CHASSIS_MODE_KEYBOARD_PRONE) {
+                    wlr.high_flag = 0;
+                    key_status_clear(KEY_CHASSIS_HEIGHT);
+                }
+            } else if (wlr.high_flag == 2) {
+                if (kb_status[KEY_CHASSIS_HEIGHT] == KEY_RUN && 
+                    chassis.mode != CHASSIS_MODE_KEYBOARD_PRONE) {
+                    wlr.high_flag = 1;
+                    key_status_clear(KEY_CHASSIS_HEIGHT2);
+                } else if (kb_status[KEY_CHASSIS_HEIGHT2] != KEY_RUN ||
+                    chassis.mode == CHASSIS_MODE_KEYBOARD_PRONE) {
+                    wlr.high_flag = 0;
+                    key_status_clear(KEY_CHASSIS_HEIGHT2);
+                }
             } else {
                 wlr.high_flag = 0;
                 key_status_clear(KEY_CHASSIS_HEIGHT);
+                key_status_clear(KEY_CHASSIS_HEIGHT2);
             }
+            
+//            if(kb_status[KEY_CHASSIS_HEIGHT] == KEY_RUN && 
+//                kb_status[KEY_CHASSIS_HEIGHT2] == KEY_RUN &&
+//                chassis.mode != CHASSIS_MODE_KEYBOARD_PRONE) {
+//                wlr.high_flag = 1;  //趴倒模式不能起
+//            } else if (kb_status[KEY_CHASSIS_HEIGHT] == KEY_RUN && 
+//                chassis.mode != CHASSIS_MODE_KEYBOARD_PRONE) {
+//                wlr.high_flag = 1;
+//            } else if (kb_status[KEY_CHASSIS_HEIGHT2] == KEY_RUN && 
+//                chassis.mode != CHASSIS_MODE_KEYBOARD_PRONE) {
+//                wlr.high_flag = 2;
+//            } else {
+//                wlr.high_flag = 0;
+//                key_status_clear(KEY_CHASSIS_HEIGHT);
+//                key_status_clear(KEY_CHASSIS_HEIGHT2);
+//            }
             break;
         }
         default:break;
@@ -350,6 +397,10 @@ static void chassis_data_input(void)
         wlr.yaw_set -= 2 * PI;
     //此yaw_err用于平移速度体系换算
     wlr.yaw_err = circle_error((float)CHASSIS_YAW_OFFSET / 8192 * 2 * PI, (float)yaw_motor.ecd / 8192 * 2 * PI, 2 * PI);
+    if (chassis.mode == CHASSIS_MODE_REMOTER_ROTATE ||
+        chassis.mode == CHASSIS_MODE_KEYBOARD_ROTATE) {
+        wlr.yaw_err += wlr.yaw_offset;
+    }
     chassis.output.vx = chassis.input.vx * arm_cos_f32(wlr.yaw_err) - chassis.input.vy * arm_sin_f32(wlr.yaw_err);
     chassis.output.vy = chassis.input.vx * arm_sin_f32(wlr.yaw_err) + chassis.input.vy * arm_cos_f32(wlr.yaw_err);
     //此yaw_err用于旋转速度pid

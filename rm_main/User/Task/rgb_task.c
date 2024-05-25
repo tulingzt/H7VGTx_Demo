@@ -9,6 +9,8 @@
 #include "wlr.h"
 
 #include "prot_dr16.h"
+#include "prot_vision.h"
+#include "prot_power.h"
 
 #include "stm32h7xx_hal.h"
 #include "cmsis_os.h"
@@ -39,39 +41,36 @@ void read_status(void)
         rgb_change(2,0);
     }
     
-    if (kb_status[KB_CTRL] == KEY_RUN) {
-        rgb_change(3,2);
-    } else if (kb_status[KEY_CHASSIS_POWER] == KEY_RUN) {
+    if (kb_status[KEY_CHASSIS_POWER] == KEY_RUN) {
         rgb_change(3,1);
+    } else if (kb_status[KB_CTRL] == KEY_RUN) {
+        rgb_change(3,2);
     } else if (kb_status[KEY_CHASSIS_LOWSPEED] == KEY_RUN) {
         rgb_change(3,3);
     } else {
         rgb_change(3,0);
     }
     
-    if (wlr.high_flag) {
-        rgb_change(4,7);
-    } else if (wlr.prone_flag) {
+    if (wlr.high_flag == 2) {
         rgb_change(4,1);
+    } else if (wlr.high_flag == 1) {
+        rgb_change(4,7);
+    }else if (wlr.prone_flag) {
+        rgb_change(4,2);
     } else {
         rgb_change(4,0);
     }
+
+    if (vision.tx.data.aiming_mode == 0) {
+        rgb_change(5,2);
+    } else if (vision.tx.data.aiming_mode == 1) {
+        rgb_change(5,1);
+    } else {
+        rgb_change(5,3);
+    }
     
-//    if (fric.mode == FIRC_MODE_RUN) {
-//        if (shoot.trigger_mode == TRIGGER_MODE_SINGLE || shoot.trigger_mode == TRIGGER_MODE_SERIES) {
-//            rgb_change(5,1);
-//        } else {
-//            rgb_change(5,7);
-//        }
-//    } else {
-//        rgb_change(5,0);
-//    }
-    
-//    if (house_mode == HOUSE_MODE_OPEN) {
-//        rgb_change(6,1);
-//    } else {
-//        rgb_change(6,0);
-//    }
+    rgb_change(6,8);
+    rgb_set_bright(6, supercap.volume_percent/20);
 }
 
 void rgb_task(void const *argu)

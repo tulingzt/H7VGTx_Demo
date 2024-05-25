@@ -117,17 +117,17 @@ void ht_motor_output_single_data(ht_motor_t *motor)
     static uint8_t buf[8];
     uint16_t p, v ,kp, kd, t;
 //    //限制输入的参数在定义的范围内
-//    LIMIT_MIN_MAX(motor->p, P_MIN, P_MAX);
-//    LIMIT_MIN_MAX(motor->v, V_MIN, V_MAX);
-//    LIMIT_MIN_MAX(motor->kp, KP_MIN, KP_MAX);
-//    LIMIT_MIN_MAX(motor->kd, KD_MIN, KD_MAX);
-//    LIMIT_MIN_MAX(motor->t, T_MIN+1, T_MAX-1);
+    LIMIT_MIN_MAX(motor->p, P_MIN, P_MAX);
+    LIMIT_MIN_MAX(motor->v, V_MIN, V_MAX);
+    LIMIT_MIN_MAX(motor->kp, KP_MIN, KP_MAX);
+    LIMIT_MIN_MAX(motor->kd, KD_MIN, KD_MAX);
+    LIMIT_MIN_MAX(motor->t, T_MIN+1, T_MAX-1);
     //根据协议，对float参数进行转换
     p = float_to_uint(motor->p, P_MIN, P_MAX, 16);
     v = float_to_uint(motor->v, V_MIN, V_MAX, 12);
     kp = float_to_uint(motor->kp, KP_MIN, KP_MAX, 12);
     kd = float_to_uint(motor->kd, KD_MIN, KD_MAX, 12);
-    t = float_to_uint(motor->t, T_MIN, T_MAX, 12);
+    t = float_to_uint(motor->t, T_MIN+1, T_MAX-1, 12);
     //根据传输协议，把数据转换为CAN命令数据字段
     buf[0] = p >> 8;
     buf[1] = p & 0xFF;

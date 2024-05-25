@@ -39,6 +39,11 @@ void rgb_change(uint8_t i, uint8_t status)
     rgb.rgb_status[i] = status;
 }
 
+void rgb_set_bright(uint8_t i, uint8_t bright)
+{
+    rgb_set_color(i, (rgb_color_t){bright,bright,bright});
+}
+
 void rgb_output_data(void)
 {
     for (int i = 0; i < RGB_NUM; i++) {

@@ -10,9 +10,9 @@
 
 #define SHOOT_SPEED_NUM 15
 #define ABS(x) ((x>0)? (x): (-(x)))
-#define TRIGGER_MOTOR_ECD   36859.0f  //拨盘一颗子弹转过的编码值 8191 * 36 / 8 = 36859.5f
+#define TRIGGER_MOTOR_ECD   (0.7f*32818.0f)  //拨盘一颗子弹转过的编码值 8191 * 36 / 8 = 36859.5f
 
-float MIN_HEAT = 30;        //热量控制裕量
+float MIN_HEAT = 40;        //热量控制裕量
 
 static uint16_t frequency_cnt = 0;	//射击周期计算
 static uint8_t  shoot_enable  = 1;  //单发使能标志
@@ -25,7 +25,8 @@ static uint8_t single_shoot_reset(void)
 {
     return (
         (rc.mouse.l == 0 && ctrl_mode == KEYBOARD_MODE)
-        || (ABS(rc.ch5) < 10 && ctrl_mode == REMOTER_MODE)
+//        || (ABS(rc.ch5) < 10 && ctrl_mode == REMOTER_MODE
+        || (ABS(rc.ch5) < 10)
     );
 }
 
@@ -44,8 +45,8 @@ static uint8_t series_shoot_enable(void)
     return (
 //        ((ctrl_mode == REMOTER_MODE)
         ((ctrl_mode == REMOTER_MODE && vision.shoot_enable)// && vision.shoot_enable
-            || (ctrl_mode == PROTECT_MODE && rc.sw2 == RC_DN)
-//            || (ctrl_mode == PROTECT_MODE && rc.sw2 == RC_DN && vision.shoot_enable)
+//            || (ctrl_mode == PROTECT_MODE && rc.sw2 == RC_DN)
+            || (ctrl_mode == PROTECT_MODE && rc.sw2 == RC_DN && vision.shoot_enable)
             || (ctrl_mode == KEYBOARD_MODE && rc.mouse.l && rc.mouse.r && vision.shoot_enable)
             || (ctrl_mode == KEYBOARD_MODE && rc.mouse.l && rc.mouse.r == 0)
         )
@@ -202,10 +203,11 @@ static void shoot_mode_switch(void)
             /* 摩擦轮和拨盘模式切换 */
             switch (rc.sw2) {
                 case RC_UP: {
-                    shoot.fric_mode = FRIC_MODE_PROTECT;
                     if (ctrl_mode == PROTECT_MODE) {
+                        shoot.fric_mode = FRIC_MODE_STOP;
                         shoot.trigger_mode = TRIGGER_MODE_PROTECT;
                     } else {
+                        shoot.fric_mode = FRIC_MODE_STOP;
                         shoot.trigger_mode = TRIGGER_MODE_STOP;
                     }
                     break;
@@ -217,7 +219,7 @@ static void shoot_mode_switch(void)
                 }
                 case RC_DN: {
                     shoot.fric_mode = FRIC_MODE_RUN;
-                    shoot.trigger_mode = TRIGGER_MODE_SERIES;
+                    shoot.trigger_mode = TRIGGER_MODE_SINGLE;
                     break;
                 }
                 default: break;
@@ -236,11 +238,22 @@ static void shoot_mode_switch(void)
             } else {
                 shoot.fric_mode = FRIC_MODE_PROTECT;  //摩擦轮断电，软件保护，禁用摩擦轮
             }
-            /* 拨盘模式切换 */
-            if (shoot.fric_mode == FRIC_MODE_RUN) {  //开摩擦轮
-                shoot.trigger_mode = TRIGGER_MODE_SERIES;
+            /* 视觉模式切换 */
+            if (rc.kb.bit.SHIFT) {
+                vision.tx.data.aiming_mode = 1;
+            } else if (rc.kb.bit.B) {
+                vision.tx.data.aiming_mode = 2;
             } else {
+                vision.tx.data.aiming_mode = 0;
+            }
+            /* 拨盘模式切换 */
+            if (shoot.fric_mode != FRIC_MODE_RUN) {
                 shoot.trigger_mode = TRIGGER_MODE_STOP;
+            }
+            else if (vision.tx.data.aiming_mode != 0) {
+                shoot.trigger_mode = TRIGGER_MODE_SINGLE;
+            } else {
+                shoot.trigger_mode = TRIGGER_MODE_SERIES;
             }
             break;
         }

@@ -33,7 +33,7 @@
 #include "shoot_task.h"
 #include "rgb_task.h"
 #include "debug_task.h"
-
+#include "ui_task.h"
 #include "tim.h"
 
 /* USER CODE END Includes */
@@ -61,6 +61,7 @@ osThreadId ChassisTaskHandle;
 osThreadId GimbalTaskHandle;
 osThreadId ShootTaskHandle;
 osThreadId RGBTaskHandle;
+osThreadId UITaskHandle;
 osThreadId DebugTaskHandle;
 /* USER CODE END Variables */
 osThreadId StartTaskHandle;
@@ -156,6 +157,8 @@ void MX_FREERTOS_Init(void) {
   RGBTaskHandle = osThreadCreate(osThread(RGBTask), NULL);
   osThreadDef(DebugTask, debug_task, osPriorityLow, 0, 128);
   DebugTaskHandle = osThreadCreate(osThread(DebugTask), NULL);
+  osThreadDef(UITask, ui_task, osPriorityLow, 0, 128);
+  DebugTaskHandle = osThreadCreate(osThread(UITask), NULL);
   /* USER CODE END RTOS_THREADS */
 
 }

@@ -21,6 +21,7 @@ typedef struct
 extern rgb_t rgb;
 
 void rgb_change(uint8_t i, uint8_t status);
+void rgb_set_bright(uint8_t i, uint8_t bright);
 void rgb_output_data(void);
 
 #endif

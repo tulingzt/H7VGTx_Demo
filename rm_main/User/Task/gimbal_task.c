@@ -10,6 +10,18 @@
 #include "arm_math.h"
 #include "string.h"
 
+#include "func_generator.h"
+
+FGT_agl_t yaw_test = {
+    .Td = 2,
+    .time = 0,
+    .T1 = 200,
+    .T2 = 0,
+    .T1_out = 0,
+    .T2_out = 0.175,
+    .out = 0
+};
+
 gimbal_scale_t gimbal_scale = {
     .ecd_remote = 1,
     .ecd_keyboard = 1,
@@ -22,12 +34,13 @@ uint8_t test_gimbal_vision_mode = 0;//遥控0 视觉1
 static void gimbal_init(void)
 {
     memset(&gimbal, 0, sizeof(gimbal_t));
-    pid_init(&gimbal.yaw_angle.pid, NONE, 20, 0, 300, 0, 15);
-    pid_init(&gimbal.yaw_spd.pid, NONE, 0.5f, 0.006f, 0, 0.6f, 1.3f);
-
+    
     pid_init(&gimbal.pit_angle.pid, NONE, 20, 0, 50, 0, 15);
     pid_init(&gimbal.pit_spd.pid, NONE, -0.2f, -0.003f, 0, 0.3f, 1.3f);
-    float yaw_feed_c[3] = {50, 0, 0};
+    
+    pid_init(&gimbal.yaw_angle.pid, NONE, 20, 0, 200, 0, 15);
+    pid_init(&gimbal.yaw_spd.pid, NONE, 0.5f, 0.006f, 0, 0.6f, 1.3f);
+    float yaw_feed_c[3] = {200, 0, 0};
     feed_forward_init(&gimbal.yaw_feedforward, 0.002f, 2, yaw_feed_c, 0);
 }
 
@@ -53,6 +66,8 @@ static void gimbal_pid_calc(void)
         gimbal.yaw_angle.ref -= 2 * PI;
         gimbal.last_yaw_ref -= 2 * PI;
     }
+    //视觉测试
+    gimbal.yaw_angle.ref = FGT_agl_calc(&yaw_test);
     gimbal.yaw_angle.fdb = gimbal_imu.yaw;
     //此yaw_err用于云台yaw环形控制
     yaw_err = circle_error(gimbal.yaw_angle.ref, gimbal.yaw_angle.fdb, 2*PI);
@@ -118,6 +133,7 @@ void gimbal_task(void const *argu)
                     gimbal.pit_angle.ref = 0;
                     gimbal.pit_output = 0;
                     gimbal.yaw_output = 0;
+                    gimbal.yaw_angle.ref = FGT_agl_calc(&yaw_test);
                 }
                 break;
             }

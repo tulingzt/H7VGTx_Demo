@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H723xx,ARM_MATH_CM4,__CC_ARM,__TARGET_FPU_VFP</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../USB_DEVICE/App;../USB_DEVICE/Target;../User/Communication;../User/Drivers;../User/Protocol;../User/Math/DSP/Include;../User/Math;../User/Model;../User/Support;../User/Middle;../User/Task</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../USB_DEVICE/App;../USB_DEVICE/Target;../User/Communication;../User/Drivers;../User/Protocol;../User/Math/DSP/Include;../User/Math;../User/Model;../User/Support;../User/Middle;../User/Task;..\User\UI</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -916,6 +916,11 @@
               <FilePath>..\User\Task\rgb_task.c</FilePath>
             </File>
             <File>
+              <FileName>ui_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\ui_task.c</FilePath>
+            </File>
+            <File>
               <FileName>control_def.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\User\Task\control_def.h</FilePath>
@@ -1024,6 +1029,56 @@
               <FileName>pid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Math\pid.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>User/UI</GroupName>
+          <Files>
+            <File>
+              <FileName>ui_interface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\UI\ui_interface.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_default_group1_0.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\UI\ui_default_group1_0.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_default_group2_0.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\UI\ui_default_group2_0.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_default_group2_1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\UI\ui_default_group2_1.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_default_group2_2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\UI\ui_default_group2_2.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_default_group2_3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\UI\ui_default_group2_3.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_default_group2_4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\UI\ui_default_group2_4.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_default_group3_0.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\UI\ui_default_group3_0.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_default_group4_0.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\UI\ui_default_group4_0.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -27,9 +27,9 @@ typedef struct
     //反馈数据
     float yaw_fdb, roll_fdb, pit_fdb, wz_fdb, wx_fdb, wy_fdb, az_fdb;
     //补偿
-    float q0_offs, roll_offs, wz_offs;
+    float q0_offs, roll_offs, wz_offs, yaw_offset;
     //控制标志
-    uint8_t jump_flag, jump_cnt, high_flag, prone_flag, ctrl_mode;
+    uint8_t jump_flag, jump_cnt, high_flag, shift_flag, prone_flag, ctrl_mode;
     //单侧控制参数
     struct
     {

@@ -422,11 +422,13 @@ typedef __packed struct
 
 extern frame_header_t frame_header;
 
+extern game_status_t game_status;
 extern robot_status_t robot_status;
 extern shoot_data_t shoot_data;
 extern power_heat_data_t power_heat_data;
 
 void judge_init(UART_HandleTypeDef *huart);
 uint8_t judge_get_data(uint8_t *data);
+void judge_send_data(uint8_t* message, int length);
 
 #endif

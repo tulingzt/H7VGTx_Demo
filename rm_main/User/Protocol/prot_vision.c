@@ -37,8 +37,8 @@ void vision_get_data(uint8_t *data)
         vision.new_frame_flag = 1;
         vision.target_yaw_angle = vision.rx[0].data.yaw / 180.0f * PI;
         vision.target_pit_angle = -vision.rx[0].data.pit / 180.0f * PI;
-        vision.min_yaw_err = vision.rx[0].data.dis / 180.0f * PI;
-        if (ABS(gimbal.yaw_angle.fdb - vision.target_yaw_angle) < vision.min_yaw_err)
+        vision.min_err = vision.rx[0].data.dis / 180.0f * PI;
+        if (ABS(gimbal.yaw_angle.fdb - vision.target_yaw_angle) < vision.min_err && ABS(gimbal.pit_angle.fdb - vision.target_pit_angle) < vision.min_err)
             vision.shoot_enable = 1;
         else
             vision.shoot_enable = 0;
@@ -68,7 +68,7 @@ void vision_output_data(void)
 //    }
     vision.tx.data.shooter_speed = 3;
     
-    vision.tx.data.aiming_mode = 1;
+//    vision.tx.data.aiming_mode = 1;
     vision.tx.data.vacancy = 0;
     
     if (robot_status.robot_id > 100) {

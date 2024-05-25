@@ -36,7 +36,7 @@ typedef struct
     vision_aim_status_e aim_status;
     uint32_t new_frame_flag;
     float target_yaw_angle, target_pit_angle;
-    float min_yaw_err;
+    float min_err;
     uint32_t shoot_enable;
     union
     {
