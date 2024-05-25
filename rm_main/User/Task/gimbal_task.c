@@ -38,7 +38,7 @@ static void gimbal_init(void)
     pid_init(&gimbal.pit_angle.pid, NONE, 20, 0, 50, 0, 15);
     pid_init(&gimbal.pit_spd.pid, NONE, -0.2f, -0.003f, 0, 0.3f, 1.3f);
     
-    pid_init(&gimbal.yaw_angle.pid, NONE, 20, 0, 200, 0, 15);
+    pid_init(&gimbal.yaw_angle.pid, NONE, 20, 0, 300, 0, 15);
     pid_init(&gimbal.yaw_spd.pid, NONE, 0.5f, 0.006f, 0, 0.6f, 1.3f);
     float yaw_feed_c[3] = {200, 0, 0};
     feed_forward_init(&gimbal.yaw_feedforward, 0.002f, 2, yaw_feed_c, 0);
@@ -67,7 +67,7 @@ static void gimbal_pid_calc(void)
         gimbal.last_yaw_ref -= 2 * PI;
     }
     //视觉测试
-    gimbal.yaw_angle.ref = FGT_agl_calc(&yaw_test);
+//    gimbal.yaw_angle.ref = FGT_agl_calc(&yaw_test);
     gimbal.yaw_angle.fdb = gimbal_imu.yaw;
     //此yaw_err用于云台yaw环形控制
     yaw_err = circle_error(gimbal.yaw_angle.ref, gimbal.yaw_angle.fdb, 2*PI);

@@ -214,12 +214,12 @@ static void shoot_mode_switch(void)
                 }
                 case RC_MI: {
                     shoot.fric_mode = FRIC_MODE_RUN;
-                    shoot.trigger_mode = TRIGGER_MODE_STOP;
+                    shoot.trigger_mode = TRIGGER_MODE_SINGLE;
                     break;
                 }
                 case RC_DN: {
                     shoot.fric_mode = FRIC_MODE_RUN;
-                    shoot.trigger_mode = TRIGGER_MODE_SINGLE;
+                    shoot.trigger_mode = TRIGGER_MODE_SERIES;
                     break;
                 }
                 default: break;
